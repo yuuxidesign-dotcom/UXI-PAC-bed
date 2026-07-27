@@ -26,6 +26,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans
 .ni{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;color:var(--gray-500);border-left:3px solid transparent;cursor:default}
 .ni.active{background:var(--blue-l);color:var(--blue);font-weight:600;border-left-color:var(--blue)}
 .ni.disabled{opacity:.38;cursor:not-allowed}
+.ni.linkable{cursor:pointer}
+.ni.linkable:hover{background:var(--gray-50)}
 .sf{padding:11px 14px;border-top:1px solid var(--gray-200)}
 .ur{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .uav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
@@ -106,6 +108,8 @@ select.fs{padding:6px 10px;border:1px solid var(--gray-300);border-radius:6px;fo
 .bd2{font-size:10px;color:var(--gray-400);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bl{font-size:11px;font-weight:700;color:var(--gray-400);flex-shrink:0}
 .el{font-size:11px;color:var(--gray-400);font-style:italic;white-space:nowrap}
+.rg-tag{font-size:9px;font-weight:600;margin-top:2px;white-space:nowrap}
+.rg-tag.m{color:#1E40AF}.rg-tag.f{color:#9F1239}
 
 /* Case list */
 .sl2{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.06em;padding:8px 0 6px;margin-top:6px;display:flex;align-items:center;gap:8px}
@@ -207,6 +211,8 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
 .cdi{background:#FFEDD5;color:#EA580C;font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;display:inline-block}
 .cdo{background:var(--purple-l);color:var(--purple);font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;display:inline-block}
 .tdtag{background:var(--blue);color:var(--white);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;display:inline-block}
+.rmpk-badge{background:var(--purple-l);color:var(--purple);font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;display:inline-block;margin-left:4px}
+.stuck-tag{background:var(--red-l);color:var(--red);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;display:inline-block;margin-left:4px}
 .upz{border:2px dashed var(--gray-300);border-radius:8px;padding:24px 20px;text-align:center;color:var(--gray-400);cursor:pointer;transition:all .15s}
 .upz:hover{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
 .ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
@@ -219,7 +225,8 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
   <div class="logo-wrap"><div class="logo-t">PAC 管理系統</div><div class="logo-s">急性後期照護</div></div>
   <nav class="nav-wrap">
     <div class="ni disabled">🏠 個人儀表板</div>
-    <div class="ni disabled">📋 個案管理</div>
+    <div class="ni linkable" onclick="location.href='收案管理.html'">📋 收案管理</div>
+    <div class="ni linkable" onclick="location.href='個案管理4.html'">🗂 個案管理</div>
     <div class="ni active">🛏 排床管理</div>
     <div class="ni disabled">📅 班表總覽頁</div>
     <div class="ni disabled">🏡 居家排班管理</div>
@@ -281,13 +288,14 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
 
       <!-- 統計卡：第一排為狀態統計（點擊篩選），第二排為時間提醒（點擊捲動至對應區塊） -->
       <div class="stats-strip">
-        <div class="sc sa" onclick="toggleStatFilter('avail',this)"><div class="sl">可使用</div><div class="sv" id="sc-avail">19</div></div>
+        <div class="sc sa" onclick="toggleStatFilter('avail',this)"><div class="sl">可使用</div><div class="sv" id="sc-avail">18</div></div>
         <div class="sc" onclick="toggleStatFilter('hosp-pac',this)"><div class="sl">PAC 住院中</div><div class="sv">42</div></div>
         <div class="sc" onclick="toggleStatFilter('hosp-gen',this)"><div class="sl">一般住院</div><div class="sv">22</div></div>
         <div class="sc" onclick="toggleStatFilter('hosp-hos',this)"><div class="sl">安寧</div><div class="sv">5</div></div>
         <div class="sc" onclick="toggleStatFilter('reserved',this)"><div class="sl">已預約</div><div class="sv">5</div></div>
         <div class="sc" onclick="toggleStatFilter('pending',this)"><div class="sl">待排床</div><div class="sv">3</div></div>
         <div class="sc" onclick="toggleStatFilter('clean',this)"><div class="sl">清潔／維修</div><div class="sv">1</div></div>
+        <div class="sc" onclick="toggleStatFilter('pack',this)"><div class="sl">包房</div><div class="sv">1</div></div>
       </div>
       <div class="stats-strip">
         <div class="sc si" onclick="scrollToCaseSection('section-today-in')"><div class="sl">即將入院（3天內）</div><div class="sv">3</div><div class="ss">06/26 陳志明・06/27 蔡美玲…</div></div>
@@ -311,6 +319,14 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
           <select class="fs"><option>全部類型</option><option>PAC</option><option>安寧</option><option>一般（復健）</option><option>一般（開刀）</option></select>
           <select class="fs"><option>全部樓層</option><option>3F</option><option>5F</option><option>6F</option></select>
           <select class="fs"><option>展延狀態</option><option>展延申請中</option><option>展延通過</option></select>
+          <select class="fs" onchange="applyReferralFilter(this.value)">
+            <option value="">全部來源</option>
+            <option value="自收">自收</option>
+            <option value="彰基轉入">彰基轉入</option>
+            <option value="員基轉入">員基轉入</option>
+            <option value="其他醫院轉入">其他醫院轉入</option>
+            <option value="居家轉住院">居家轉住院</option>
+          </select>
         </div>
         <div class="tr"><span style="font-size:11px;color:var(--gray-400)">排序：預計出院日（近→遠）</span></div>
       </div>
@@ -374,7 +390,7 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
       <table class="ct">
         <thead><tr><th style="width:24px"></th><th>姓名</th><th>年齡/性別</th><th>類型</th><th>疾病別</th><th>床位</th><th>病歷號</th><th>入院日</th><th>預計出院</th><th>展延</th><th>操作</th></tr></thead>
         <tbody id="extend-body">
-          <tr onclick="toggleX('x7')">
+          <tr data-referral="彰基轉入" onclick="toggleX('x7')">
             <td><button class="xb" id="xb7">▶</button></td>
             <td><strong>吳麗珠</strong> <span class="tdtag">今日更新</span></td><td>70歲 女</td>
             <td><span class="tt-pac">PAC</span></td><td>腦中風</td><td><strong>303-B</strong></td><td>00073289</td>
@@ -382,11 +398,11 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td>
           </tr>
           <tr id="x7" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00073289</span></div><div class="xf"><label>主治醫師</label><span>王主任（神經內科）</span></div><div class="xf"><label>照護週數</label><span>第 3 週 / 6 週</span></div><div class="xf"><label>家屬</label><span>吳建志（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0967-234-567 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>房型</label><span>雙人房（303病室）</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00073289</span></div><div class="xf"><label>主治醫師</label><span>王主任（神經內科）</span></div><div class="xf"><label>照護週數</label><span>第 3 週 / 6 週</span></div><div class="xf"><label>家屬</label><span>吳建志（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0967-234-567 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>房型</label><span>雙人房（303病室）</span></div><div class="xf"><label>轉介來源</label><span>彰基轉入</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：吳麗珠')">前往個案管理 →</button><button class="btn bg btn-xs" onclick="openModal('m-edit')">編輯排床</button><button class="btn bd btn-xs" onclick="openDischargeConfirm(null,'303-B','吳麗珠')">確認出院</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote">今日更新：展延申請已送出，等待健保署回覆。</textarea>
           </td></tr>
-          <tr id="dis-row-301-B" onclick="toggleX('x6')">
+          <tr id="dis-row-301-B" data-referral="自收" onclick="toggleX('x6')">
             <td><button class="xb" id="xb6">▶</button></td>
             <td><strong>鄭大偉</strong></td><td>62歲 男</td>
             <td><span class="tt-pac">PAC</span></td><td>脆弱性骨折</td><td><strong>301-B</strong></td><td>00073312</td>
@@ -395,13 +411,13 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <td><button class="btn bp btn-xs" onclick="event.stopPropagation();toggleX('x6')">確認新日期</button><button class="btn bd btn-xs" onclick="event.stopPropagation();openDischargeConfirm(null,'301-B','鄭大偉')">確認出院</button></td>
           </tr>
           <tr id="x6" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00073312</span></div><div class="xf"><label>主治醫師</label><span>陳醫師（復健科）</span></div><div class="xf"><label>照護週數</label><span>第 4 週 / 3 週療程（展延後）</span></div><div class="xf"><label>家屬</label><span>鄭小芳（配偶）</span></div><div class="xf"><label>家屬電話</label><span>0956-123-456 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>房型</label><span>雙人房（301病室）</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00073312</span></div><div class="xf"><label>主治醫師</label><span>陳醫師（復健科）</span></div><div class="xf"><label>照護週數</label><span>第 4 週 / 3 週療程（展延後）</span></div><div class="xf"><label>家屬</label><span>鄭小芳（配偶）</span></div><div class="xf"><label>家屬電話</label><span>0956-123-456 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>房型</label><span>雙人房（301病室）</span></div><div class="xf"><label>轉介來源</label><span>自收</span></div></div>
             <div style="margin-top:8px"><div class="xf"><label>展延通過・預計出院日更新</label></div>
             <div class="xdr"><input type="date" value="2026-07-12"><button class="btn bp btn-xs" onclick="alert('預計出院日已更新為 2026/07/12，已同步個案管理')">確認新日期</button><span style="font-size:11px;color:var(--gray-400)">原始：06/27</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：鄭大偉')">前往個案管理 →</button><button class="btn bg btn-xs" onclick="openModal('m-edit')">編輯排床</button><button class="btn bd btn-xs" onclick="openDischargeConfirm(null,'301-B','鄭大偉')">確認出院</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote">展延通過至 07/12，若功能持續改善可提早出院。</textarea>
           </td></tr>
-          <tr onclick="toggleX('xlw')">
+          <tr data-referral="員基轉入" onclick="toggleX('xlw')">
             <td><button class="xb" id="xblw">▶</button></td>
             <td><strong>李文雄</strong></td><td>75歲 男</td>
             <td><span class="tt-pac">PAC</span></td><td>腦中風</td><td><strong>301-A</strong></td><td>00073430</td>
@@ -409,7 +425,7 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td>
           </tr>
           <tr id="xlw" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00073430</span></div><div class="xf"><label>主治醫師</label><span>王主任（神經內科）</span></div><div class="xf"><label>照護週數</label><span>第 4 週 / 6 週</span></div><div class="xf"><label>家屬</label><span>李大明（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0912-345-678 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>房型</label><span>4人房（301病室）</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00073430</span></div><div class="xf"><label>主治醫師</label><span>王主任（神經內科）</span></div><div class="xf"><label>照護週數</label><span>第 4 週 / 6 週</span></div><div class="xf"><label>家屬</label><span>李大明（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0912-345-678 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>房型</label><span>4人房（301病室）</span></div><div class="xf"><label>轉介來源</label><span>員基轉入</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：李文雄')">前往個案管理 →</button><button class="btn bg btn-xs" onclick="openModal('m-edit')">編輯排床</button><button class="btn bd btn-xs" onclick="openDischargeConfirm(null,'301-A','李文雄')">確認出院</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
@@ -421,45 +437,45 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
       <table class="ct">
         <thead><tr><th style="width:24px"></th><th>姓名</th><th>年齡/性別</th><th>類型</th><th>疾病別</th><th>床位</th><th>房型偏好</th><th>預計入院</th><th>預計出院</th><th>個管師</th><th>操作</th></tr></thead>
         <tbody id="pending-body">
-          <tr id="pend-row-t1" onclick="toggleX('xt1')"><td><button class="xb" id="xbt1">▶</button></td>
+          <tr id="pend-row-t1" data-referral="自收" onclick="toggleX('xt1')"><td><button class="xb" id="xbt1">▶</button></td>
             <td><strong>排床測試</strong></td><td>68歲 男</td><td><span class="tt-pac">PAC</span></td><td>脆弱性骨折</td>
             <td style="color:var(--amber)">尚未安排</td><td>無偏好</td>
             <td>2026/06/27</td><td>—</td><td>林美惠</td>
             <td><button class="btn bp btn-xs" onclick="event.stopPropagation();openCaseModal('t1')">安排床位</button></td>
           </tr>
           <tr id="xt1" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00099999</span></div><div class="xf"><label>主治醫師</label><span>許醫師（骨科）</span></div><div class="xf"><label>PAC療程</label><span>脆弱性骨折・14天（2週）</span></div><div class="xf"><label>家屬</label><span>陳小華（女兒）</span></div><div class="xf"><label>家屬電話</label><span>0966-777-888</span></div><div class="xf"><label>房型偏好</label><span>無偏好</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00099999</span></div><div class="xf"><label>主治醫師</label><span>許醫師（骨科）</span></div><div class="xf"><label>PAC療程</label><span>脆弱性骨折・14天（2週）</span></div><div class="xf"><label>家屬</label><span>陳小華（女兒）</span></div><div class="xf"><label>家屬電話</label><span>0966-777-888</span></div><div class="xf"><label>房型偏好</label><span>無偏好</span></div><div class="xf"><label>轉介來源</label><span>自收</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：排床測試')">前往個案管理 →</button><button class="btn bp btn-xs" onclick="openCaseModal('t1')">安排床位</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
-          <tr onclick="toggleX('x1')"><td><button class="xb" id="xb1">▶</button></td>
+          <tr data-referral="彰基轉入" onclick="toggleX('x1')"><td><button class="xb" id="xb1">▶</button></td>
             <td><strong>陳志明</strong></td><td>68歲 男</td><td><span class="tt-pac">PAC</span></td><td>腦中風</td>
             <td style="color:var(--amber)">尚未安排</td><td>單人房</td>
             <td><span style="color:#EA580C;font-weight:600">06/26 ⚡</span></td><td>—</td><td>林美惠</td>
             <td><button class="btn bp btn-xs" onclick="event.stopPropagation();openCaseModal('p1')">安排床位</button></td>
           </tr>
           <tr id="x1" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00073450</span></div><div class="xf"><label>主治醫師</label><span>王主任（神經內科）</span></div><div class="xf"><label>PAC療程</label><span>腦中風・42天（6週）</span></div><div class="xf"><label>家屬</label><span>陳小明（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0912-345-678</span></div><div class="xf"><label>房型偏好</label><span>單人房</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00073450</span></div><div class="xf"><label>主治醫師</label><span>王主任（神經內科）</span></div><div class="xf"><label>PAC療程</label><span>腦中風・42天（6週）</span></div><div class="xf"><label>家屬</label><span>陳小明（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0912-345-678</span></div><div class="xf"><label>房型偏好</label><span>單人房</span></div><div class="xf"><label>轉介來源</label><span>彰基轉入</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：陳志明')">前往個案管理 →</button><button class="btn bp btn-xs" onclick="openCaseModal('p1')">安排床位</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
-          <tr onclick="toggleX('x2')"><td><button class="xb" id="xb2">▶</button></td>
+          <tr data-referral="員基轉入" onclick="toggleX('x2')"><td><button class="xb" id="xb2">▶</button></td>
             <td><strong>蔡美玲</strong></td><td>72歲 女</td><td><span class="tt-pac">PAC</span></td><td>脆弱性骨折</td>
             <td style="color:var(--amber)">尚未安排</td><td>無偏好</td><td>06/27</td><td>—</td><td>張雅婷</td>
             <td><button class="btn bp btn-xs" onclick="event.stopPropagation();openCaseModal('p2')">安排床位</button></td>
           </tr>
           <tr id="x2" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00073521</span></div><div class="xf"><label>主治醫師</label><span>林醫師（骨科）</span></div><div class="xf"><label>PAC療程</label><span>脆弱性骨折・14天（2週）</span></div><div class="xf"><label>家屬</label><span>蔡小芳（女兒）</span></div><div class="xf"><label>家屬電話</label><span>0923-456-789</span></div><div class="xf"><label>房型偏好</label><span>無偏好</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00073521</span></div><div class="xf"><label>主治醫師</label><span>林醫師（骨科）</span></div><div class="xf"><label>PAC療程</label><span>脆弱性骨折・14天（2週）</span></div><div class="xf"><label>家屬</label><span>蔡小芳（女兒）</span></div><div class="xf"><label>家屬電話</label><span>0923-456-789</span></div><div class="xf"><label>房型偏好</label><span>無偏好</span></div><div class="xf"><label>轉介來源</label><span>員基轉入</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：蔡美玲')">前往個案管理 →</button><button class="btn bp btn-xs" onclick="openCaseModal('p2')">安排床位</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
-          <tr onclick="toggleX('x3')"><td><button class="xb" id="xb3">▶</button></td>
+          <tr data-referral="其他醫院轉入" onclick="toggleX('x3')"><td><button class="xb" id="xb3">▶</button></td>
             <td><strong>黃建國</strong></td><td>55歲 男</td><td><span class="tt-pac">PAC</span></td><td>創傷性神經損傷</td>
             <td style="color:var(--amber)">尚未安排</td><td>雙人房</td><td>06/30</td><td>—</td><td>林美惠</td>
             <td><button class="btn bp btn-xs" onclick="event.stopPropagation();openCaseModal('p3')">安排床位</button></td>
           </tr>
           <tr id="x3" class="xrow hidden"><td colspan="11">
-            <div class="xc"><div class="xf"><label>病歷號</label><span>00073498</span></div><div class="xf"><label>主治醫師</label><span>陳醫師（復健科）</span></div><div class="xf"><label>PAC療程</label><span>創傷性神經損傷・42天（6週）</span></div><div class="xf"><label>家屬</label><span>黃美珠（配偶）</span></div><div class="xf"><label>家屬電話</label><span>0934-567-890</span></div><div class="xf"><label>房型偏好</label><span>雙人房</span></div></div>
+            <div class="xc"><div class="xf"><label>病歷號</label><span>00073498</span></div><div class="xf"><label>主治醫師</label><span>陳醫師（復健科）</span></div><div class="xf"><label>PAC療程</label><span>創傷性神經損傷・42天（6週）</span></div><div class="xf"><label>家屬</label><span>黃美珠（配偶）</span></div><div class="xf"><label>家屬電話</label><span>0934-567-890</span></div><div class="xf"><label>房型偏好</label><span>雙人房</span></div><div class="xf"><label>轉介來源</label><span>其他醫院轉入</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：黃建國')">前往個案管理 →</button><button class="btn bp btn-xs" onclick="openCaseModal('p3')">安排床位</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
@@ -476,11 +492,11 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
       </table>
 
       <!-- 住院中 -->
-      <div class="sl2" id="hdr-hosp">住院中 <span class="badge bb">2</span></div>
+      <div class="sl2" id="hdr-hosp">住院中 <span class="badge bb">3</span></div>
       <table class="ct">
         <thead><tr><th style="width:24px"></th><th>姓名</th><th>年齡/性別</th><th>類型</th><th>疾病別</th><th>床位</th><th>病歷號</th><th>入院日</th><th>預計出院</th><th>展延</th><th>操作</th></tr></thead>
         <tbody id="hosp-body">
-          <tr onclick="toggleX('x9')">
+          <tr data-referral="居家轉住院" onclick="toggleX('x9')">
             <td><button class="xb" id="xb9">▶</button></td>
             <td><strong>林淑美</strong></td><td>81歲 女</td>
             <td><span class="tt-hos">安寧</span></td><td>末期癌症（肺癌）</td>
@@ -488,11 +504,11 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td>
           </tr>
           <tr id="x9" class="xrow hidden"><td colspan="11">
-            <div class="xc c2"><div class="xf"><label>病歷號</label><span>00073355</span></div><div class="xf"><label>主治醫師</label><span>李醫師（安寧科）</span></div><div class="xf"><label>家屬</label><span>林大明（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0978-345-678 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div></div>
+            <div class="xc c2"><div class="xf"><label>病歷號</label><span>00073355</span></div><div class="xf"><label>主治醫師</label><span>李醫師（安寧科）</span></div><div class="xf"><label>家屬</label><span>林大明（兒子）</span></div><div class="xf"><label>家屬電話</label><span>0978-345-678 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>轉介來源</label><span>居家轉住院</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：林淑美')">前往個案管理 →</button><button class="btn bg btn-xs" onclick="openModal('m-edit')">編輯排床</button><button class="btn bd btn-xs" onclick="openDischargeConfirm(null,'309-A','林淑美')">確認出院</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
-          <tr onclick="toggleX('xa')">
+          <tr data-referral="其他醫院轉入" onclick="toggleX('xa')">
             <td><button class="xb" id="xbxa">▶</button></td>
             <td><strong>張志豪</strong></td><td>45歲 男</td>
             <td><span class="tt-gen">一般</span></td><td>外科開刀 <span style="font-size:10px;color:var(--gray-400)">（開刀）</span></td>
@@ -500,8 +516,21 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td>
           </tr>
           <tr id="xa" class="xrow hidden"><td colspan="11">
-            <div class="xc c2"><div class="xf"><label>病歷號</label><span>00073480</span></div><div class="xf"><label>主治醫師</label><span>趙醫師（外科）</span></div><div class="xf"><label>家屬</label><span>張美惠（配偶）</span></div><div class="xf"><label>家屬電話</label><span>0912-999-888 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div></div>
+            <div class="xc c2"><div class="xf"><label>病歷號</label><span>00073480</span></div><div class="xf"><label>主治醫師</label><span>趙醫師（外科）</span></div><div class="xf"><label>家屬</label><span>張美惠（配偶）</span></div><div class="xf"><label>家屬電話</label><span>0912-999-888 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>轉介來源</label><span>其他醫院轉入</span></div></div>
             <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：張志豪')">前往個案管理 →</button><button class="btn bg btn-xs" onclick="openModal('m-edit')">編輯排床</button><button class="btn bd btn-xs" onclick="openDischargeConfirm(null,'605-A','張志豪')">確認出院</button></div>
+            <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
+          </td></tr>
+          <!-- 滯留示範個案：預計出院日已逾期（2026/06/20 早於今日 2026/06/25），但未被排進展延分區 -->
+          <tr data-referral="其他醫院轉入" onclick="toggleX('xstuck')">
+            <td><button class="xb" id="xbstuck">▶</button></td>
+            <td><strong>蔡文彬</strong></td><td>74歲 男</td>
+            <td><span class="tt-gen">一般</span></td><td>內科住院</td><td><strong>512-B</strong></td><td>00080200</td>
+            <td>05/20</td><td style="color:var(--red);font-weight:600">06/20 已逾期</td><td>—</td>
+            <td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td>
+          </tr>
+          <tr id="xstuck" class="xrow hidden"><td colspan="11">
+            <div class="xc c2"><div class="xf"><label>病歷號</label><span>00080200</span></div><div class="xf"><label>主治醫師</label><span>周醫師（內科）</span></div><div class="xf"><label>家屬</label><span>蔡小玲（女兒）</span></div><div class="xf"><label>家屬電話</label><span>0933-222-111 <button class="btn btn-xs bg" onclick="alert('已複製')">複製</button></span></div><div class="xf"><label>轉介來源</label><span>其他醫院轉入</span></div></div>
+            <div class="xact"><button class="btn bg btn-xs" onclick="alert('前往個案管理：蔡文彬')">前往個案管理 →</button><button class="btn bg btn-xs" onclick="openModal('m-edit')">編輯排床</button><button class="btn bd btn-xs" onclick="openDischargeConfirm(null,'512-B','蔡文彬')">確認出院</button><button class="btn bs btn-xs" id="stuck-btn-xstuck" onclick="markStuckReason('xstuck','蔡文彬')">標記滯留</button></div>
             <div class="xf" style="margin-top:10px"><label>備註</label></div><textarea class="xnote" placeholder="點擊輸入備註…"></textarea>
           </td></tr>
         </tbody>
@@ -820,10 +849,10 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
                 <div class="bc avail" onclick="openBedModalFromEl(this)"><div class="bav av-em"></div><div class="bi"><div class="el">(空床)</div></div><div class="bl">B</div></div>
               </div>
             </div>
-            <!-- 611：2床AB -->
+            <!-- 611：2床AB（A 床示範「包房」狀態：許建民自費包下整間病室） -->
             <div class="room-blk"><div class="room-no">611 <span style="font-size:11px;color:var(--gray-400);font-weight:400">2人房</span></div>
               <div class="beds-g c2">
-                <div class="bc avail" onclick="openBedModalFromEl(this)"><div class="bav av-em"></div><div class="bi"><div class="el">(空床)</div></div><div class="bl">A</div></div>
+                <div class="bc" onclick="alert('此床位已由許建民（611-B）包房，暫不開放安排入住')"><div class="bav av-ml">👤</div><div class="bi"><div class="bn">許建民(71) <span class="rmpk-badge">包</span></div><div class="bd2">包房中</div></div><div class="bl">A</div></div>
                 <div class="bc" onclick="openModal('m-dpac')"><div class="bav av-ml">👤</div><div class="bi"><div class="bn">許建民(71)</div><div class="bd2">衰弱高齡</div></div><div class="bl">B</div></div>
               </div>
             </div>
@@ -932,7 +961,7 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <tr class="ar" onclick="openBedModalFromRow(this)" data-bed-status="可使用"><td><strong>609-B</strong></td><td>609</td><td>2人</td><td>6F</td><td>—</td><td style="color:var(--green);font-weight:600">(空床)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><button class="btn bp btn-xs" onclick="event.stopPropagation();openBedModalFromRow(this.closest('tr'))">安排入住</button></td></tr>
             <tr onclick="alert('床位清潔／維修中，暫不可安排入住')" data-bed-status="清潔維修"><td><strong>610-A</strong></td><td>610</td><td>2人</td><td>6F</td><td>—</td><td style="color:var(--gray-400)">(清潔中)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             <tr class="ar" onclick="openBedModalFromRow(this)" data-bed-status="可使用"><td><strong>610-B</strong></td><td>610</td><td>2人</td><td>6F</td><td>—</td><td style="color:var(--green);font-weight:600">(空床)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><button class="btn bp btn-xs" onclick="event.stopPropagation();openBedModalFromRow(this.closest('tr'))">安排入住</button></td></tr>
-            <tr class="ar" onclick="openBedModalFromRow(this)" data-bed-status="可使用"><td><strong>611-A</strong></td><td>611</td><td>2人</td><td>6F</td><td>—</td><td style="color:var(--green);font-weight:600">(空床)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><button class="btn bp btn-xs" onclick="event.stopPropagation();openBedModalFromRow(this.closest('tr'))">安排入住</button></td></tr>
+            <tr onclick="alert('此床位已包房，不開放安排入住')" data-bed-status="包房"><td><strong>611-A</strong></td><td>611</td><td>2人</td><td>6F</td><td>—</td><td>許建民(71) <span class="rmpk-badge">包</span></td><td style="color:var(--gray-400)">（包房・不開放入住）</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
             <tr onclick="openModal('m-dpac')" data-bed-status="PAC住院中"><td><strong>611-B</strong></td><td>611</td><td>2人</td><td>6F</td><td><span class="tt-pac">PAC</span></td><td>許建民(71)</td><td>衰弱高齡</td><td>00080085</td><td>06/06</td><td>07/21</td><td>—</td><td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td></tr>
             <tr onclick="openModal('m-dpac')" data-bed-status="PAC住院中"><td><strong>612-A</strong></td><td>612</td><td>1人</td><td>6F</td><td><span class="tt-pac">PAC</span></td><td>吳淑芬(68)</td><td>腦中風</td><td>00080086</td><td>06/09</td><td>07/26</td><td>—</td><td><button class="btn bg btn-xs" onclick="event.stopPropagation();openModal('m-edit')">編輯</button></td></tr>
           </tbody>
@@ -1019,11 +1048,13 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
             <select class="fs" style="margin-left:8px"><option>全部房型</option><option>單人房</option><option>雙人房</option><option>多人房（3人以上）</option></select>
           </div>
           <div class="bp2">
-            <div class="bpc tk">301-A</div><div class="bpc tk">301-B</div><div class="bpc tk">301-C</div><div class="bpc tk">301-D</div>
-            <div class="bpc tk">302-A</div><div class="bpc av pk" onclick="selBed(this,'302-B','5人房')">302-B</div>
-            <div class="bpc tk">302-C</div><div class="bpc av" onclick="selBed(this,'302-D','5人房')">302-D</div>
-            <div class="bpc av" onclick="selBed(this,'302-E','5人房')">302-E</div><div class="bpc tk">303-A</div>
+            <div class="bpc tk" data-orig-tk="1">301-A</div><div class="bpc tk" data-orig-tk="1">301-B</div><div class="bpc tk" data-orig-tk="1">301-C</div><div class="bpc tk" data-orig-tk="1">301-D</div>
+            <div class="bpc tk" data-orig-tk="1">302-A</div><div class="bpc av pk" onclick="selBed(this,'302-B','5人房')">302-B</div>
+            <div class="bpc tk" data-orig-tk="1">302-C</div><div class="bpc av" onclick="selBed(this,'302-D','5人房')">302-D</div>
+            <div class="bpc av" onclick="selBed(this,'302-E','5人房')">302-E</div><div class="bpc tk" data-orig-tk="1">303-A</div>
+            <div class="bpc av" onclick="selBed(this,'305-A','2人房')">305-A</div><div class="bpc av" onclick="selBed(this,'602-A','4人房')">602-A</div>
           </div>
+          <div id="pill-gender-hint" class="hidden" style="margin-top:6px;font-size:11px;color:var(--red);font-weight:600">⚠️ 同房已有異性住客，不可安排</div>
           <div style="margin-top:6px;font-size:11px;color:var(--gray-400)">已選擇：<strong id="selb">302-B（5人房）</strong></div>
         </div>
         <!-- 病室分組列表：僅從個案「安排床位」進入時使用（見 openCaseModal），以病室為單位摺疊顯示，資料範圍比照上方 pill 格子 -->
@@ -1101,6 +1132,7 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
           <div class="fg"><label>出生日期 <span class="req">*</span></label><input class="fc" type="date"></div>
           <div class="fg"><label>性別</label><select class="fc"><option>男</option><option>女</option></select></div>
           <div class="fg"><label>個案類型 <span class="req">*</span></label><select class="fc" onchange="onNcT(this.value)"><option value="">請選擇</option><option value="p">PAC</option><option value="h">安寧</option><option value="g">一般</option></select></div>
+          <div class="fg"><label>轉介來源</label><select class="fc"><option>自收</option><option>彰基轉入</option><option>員基轉入</option><option>其他醫院轉入</option><option>居家轉住院</option></select></div>
           <div class="fg" id="nc-pd" style="display:none"><label>PAC 疾病別</label><select class="fc"><option>腦中風</option><option>創傷性神經損傷</option><option>脆弱性骨折</option><option>衰弱高齡</option></select></div>
           <div class="fg" id="nc-gd" style="display:none"><label>一般疾病類型</label><select class="fc"><option>外科開刀</option><option>一般復健（復健）</option><option>一般復健（開刀）</option><option>安寧住院</option><option>內科住院</option><option>其他</option></select></div>
           <div class="fg"><label>房型偏好</label><select class="fc"><option>無偏好</option><option>單人房</option><option>雙人房</option><option>多人房（3人以上）</option></select></div>
@@ -1145,7 +1177,7 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
         <div style="display:flex;gap:8px;margin-bottom:14px"><input class="fc" id="his-no" style="flex:1" placeholder="輸入病歷號 e.g. 00073450"><button class="btn bp btn-sm" onclick="showHis()">查詢</button></div>
         <div id="hisres" class="hidden">
           <div class="ib" style="background:var(--green-l);color:var(--green)">✓ 查詢成功，請確認以下資料</div>
-          <div class="fg2"><div class="fg"><label>姓名</label><input class="fc" value="王建民"></div><div class="fg"><label>病歷號</label><input class="fc" value="00073450" readonly></div><div class="fg"><label>身分證</label><input class="fc" value="A123456789"></div><div class="fg"><label>出生日期</label><input class="fc" value="1952/08/20"></div></div>
+          <div class="fg2"><div class="fg"><label>姓名</label><input class="fc" value="王建民"></div><div class="fg"><label>病歷號</label><input class="fc" value="00073450" readonly></div><div class="fg"><label>身分證</label><input class="fc" value="A123456789"></div><div class="fg"><label>出生日期</label><input class="fc" value="1952/08/20"></div><div class="fg"><label>轉介來源</label><select class="fc"><option>自收</option><option>彰基轉入</option><option>員基轉入</option><option>其他醫院轉入</option><option>居家轉住院</option></select></div></div>
         </div>
         <div id="hisres-fail" class="hidden">
           <div class="ib" style="background:var(--amber-l);color:var(--amber)">查無此病歷號資料，請改用手動建立</div>
@@ -1156,10 +1188,10 @@ textarea.fc{resize:vertical;min-height:65px;line-height:1.6}
       <div id="nc-i" class="hidden">
         <div class="ib">從個案管理模組封存個案中，選擇當時未匯入排床的非PAC個案，帶入排床流程。</div>
         <table style="width:100%;border-collapse:collapse;font-size:12px;background:var(--white);border:1px solid var(--gray-200);border-radius:8px;overflow:hidden">
-          <thead><tr style="background:var(--gray-50)"><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">姓名</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">病歷號</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">診斷</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">封存類型</th><th style="padding:8px 12px;border-bottom:1px solid var(--gray-200)"></th></tr></thead>
+          <thead><tr style="background:var(--gray-50)"><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">姓名</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">病歷號</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">診斷</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">封存類型</th><th style="padding:8px 12px;text-align:left;border-bottom:1px solid var(--gray-200);font-size:10px;color:var(--gray-500);text-transform:uppercase">轉介來源</th><th style="padding:8px 12px;border-bottom:1px solid var(--gray-200)"></th></tr></thead>
           <tbody>
-            <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:9px 12px"><strong>謝國雄</strong><span style="color:var(--gray-400);font-size:11px">（80歲男）</span></td><td style="padding:9px 12px">00073388</td><td style="padding:9px 12px">一般復健</td><td style="padding:9px 12px"><span class="badge bgr">非PAC退案</span></td><td style="padding:9px 12px"><button class="btn bp btn-xs" onclick="alert('謝國雄 已匯入至待排床列表')">選擇匯入</button></td></tr>
-            <tr><td style="padding:9px 12px"><strong>吳志明</strong><span style="color:var(--gray-400);font-size:11px">（65歲男）</span></td><td style="padding:9px 12px">00073412</td><td style="padding:9px 12px">外科開刀</td><td style="padding:9px 12px"><span class="badge bgr">非PAC退案</span></td><td style="padding:9px 12px"><button class="btn bp btn-xs" onclick="alert('吳志明 已匯入至待排床列表')">選擇匯入</button></td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100)"><td style="padding:9px 12px"><strong>謝國雄</strong><span style="color:var(--gray-400);font-size:11px">（80歲男）</span></td><td style="padding:9px 12px">00073388</td><td style="padding:9px 12px">一般復健</td><td style="padding:9px 12px"><span class="badge bgr">非PAC退案</span></td><td style="padding:9px 12px">自收</td><td style="padding:9px 12px"><button class="btn bp btn-xs" onclick="alert('謝國雄 已匯入至待排床列表')">選擇匯入</button></td></tr>
+            <tr><td style="padding:9px 12px"><strong>吳志明</strong><span style="color:var(--gray-400);font-size:11px">（65歲男）</span></td><td style="padding:9px 12px">00073412</td><td style="padding:9px 12px">外科開刀</td><td style="padding:9px 12px"><span class="badge bgr">非PAC退案</span></td><td style="padding:9px 12px">其他醫院轉入</td><td style="padding:9px 12px"><button class="btn bp btn-xs" onclick="alert('吳志明 已匯入至待排床列表')">選擇匯入</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -1301,8 +1333,8 @@ function goToTodayBeds(type){
 // ── 儀表板統計卡第一排（狀態統計）篩選：點擊套用／再點一次取消，最多同時一張卡片選取中 ──
 let dashFilter=null;
 const CASE_FILTER_KEYS=['pending','reserved','hosp-pac','hosp-gen','hosp-hos'];
-const BED_FILTER_KEYS=['avail','clean'];
-const BED_STATUS_LABEL={avail:'可使用',clean:'清潔維修'};
+const BED_FILTER_KEYS=['avail','clean','pack'];
+const BED_STATUS_LABEL={avail:'可使用',clean:'清潔維修',pack:'包房'};
 function toggleStatFilter(key,el){
   dashFilter=(dashFilter===key)?null:key;
   document.querySelectorAll('.stats-strip .sc').forEach(c=>c.classList.remove('active-filter'));
@@ -1345,6 +1377,12 @@ function filterRows(bodyId,predicate){
     row.classList.toggle('hidden',hide);
     const next=row.nextElementSibling;
     if(next&&next.classList.contains('xrow')&&hide) next.classList.add('hidden');
+  });
+}
+// 轉介來源篩選（工具列）：僅做最基本的文字比對，獨立運作、不與上方統計卡篩選疊加判斷
+function applyReferralFilter(val){
+  ['pending-body','reserved-body','hosp-body','extend-body'].forEach(bodyId=>{
+    filterRows(bodyId,row=>!val||row.getAttribute('data-referral')===val);
   });
 }
 // 個案排床總覽：待排床／已預約／住院中（可再依 PAC・一般・安寧細分）篩選，其餘區塊（今日入院／今日出院／展延）篩選時一律暫時隱藏
@@ -1404,8 +1442,68 @@ function filterDischargedList(){
 function switchFloor(el,id){document.querySelectorAll('.ftabs .ft').forEach(t=>t.classList.remove('active'));el.classList.add('active');['f3','f5','f6'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.toggle('hidden',i!==id);});}
 function switchView(v){document.getElementById('vgrid').classList.toggle('hidden',v!=='grid');document.getElementById('vlist').classList.toggle('hidden',v!=='list');document.getElementById('vbg').classList.toggle('active',v==='grid');document.getElementById('vbl').classList.toggle('active',v==='list');}
 function toggleX(id){const row=document.getElementById(id);const btn=document.getElementById('xb'+id.replace('x',''));const h=row.classList.contains('hidden');row.classList.toggle('hidden',!h);if(btn)btn.textContent=h?'▼':'▶';}
-function onCS(val){const cp=document.getElementById('cprev');const box=document.getElementById('cprev-box');const warn=document.getElementById('rwarn');const dis=document.getElementById('disdate');if(!val){cp.classList.add('hidden');return;}cp.classList.remove('hidden');const d={p1:{t:'陳志明・68歲男・腦中風・房型偏好：單人房',w:42,warn:true},p2:{t:'蔡美玲・72歲女・脆弱性骨折・房型偏好：無偏好',w:14,warn:false},p3:{t:'黃建國・55歲男・創傷性神經損傷・房型偏好：雙人房',w:42,warn:false},h1:{t:'王大明・76歲男・末期癌症（胃癌）',w:null,warn:false},g1:{t:'張惠美・64歲女・一般復健',w:null,warn:false},g2:{t:'林志偉・45歲男・外科開刀',w:null,warn:false},t1:{t:'排床測試・68歲男・脆弱性骨折・房型偏好：無偏好',w:14,warn:false}}[val]||{t:'個案資料',w:null,warn:false};box.innerHTML='個案：<strong>'+d.t+'</strong>';if(d.w){const dt=new Date('2026-06-27');dt.setDate(dt.getDate()+d.w);const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),dd=String(dt.getDate()).padStart(2,'0');dis.value=y+'-'+m+'-'+dd;box.innerHTML+='<br><span style="font-size:11px;color:var(--blue)">預計出院日依疾病別（'+d.w/7+'週療程）自動帶入，可手動調整。</span>';}else{dis.value='';}warn.classList.toggle('hidden',!d.warn);}
-function selBed(el,bed,type){document.querySelectorAll('.bpc.pk').forEach(c=>c.classList.remove('pk'));el.classList.add('pk');document.getElementById('selb').textContent=bed+'（'+type+'）';}
+function onCS(val){const cp=document.getElementById('cprev');const box=document.getElementById('cprev-box');const warn=document.getElementById('rwarn');const dis=document.getElementById('disdate');if(!val){cp.classList.add('hidden');return;}cp.classList.remove('hidden');const d={p1:{t:'陳志明・68歲男・腦中風・房型偏好：單人房',w:42,warn:true},p2:{t:'蔡美玲・72歲女・脆弱性骨折・房型偏好：無偏好',w:14,warn:false},p3:{t:'黃建國・55歲男・創傷性神經損傷・房型偏好：雙人房',w:42,warn:false},h1:{t:'王大明・76歲男・末期癌症（胃癌）',w:null,warn:false},g1:{t:'張惠美・64歲女・一般復健',w:null,warn:false},g2:{t:'林志偉・45歲男・外科開刀',w:null,warn:false},t1:{t:'排床測試・68歲男・脆弱性骨折・房型偏好：無偏好',w:14,warn:false}}[val]||{t:'個案資料',w:null,warn:false};box.innerHTML='個案：<strong>'+d.t+'</strong>';if(d.w){const dt=new Date('2026-06-27');dt.setDate(dt.getDate()+d.w);const y=dt.getFullYear(),m=String(dt.getMonth()+1).padStart(2,'0'),dd=String(dt.getDate()).padStart(2,'0');dis.value=y+'-'+m+'-'+dd;box.innerHTML+='<br><span style="font-size:11px;color:var(--blue)">預計出院日依疾病別（'+d.w/7+'週療程）自動帶入，可手動調整。</span>';}else{dis.value='';}warn.classList.toggle('hidden',!d.warn);selectedCaseGender=CASE_GENDER[val]||null;applyPillGenderLock();}
+function selBed(el,bed,type){if(el.classList.contains('tk'))return;document.querySelectorAll('.bpc.pk').forEach(c=>c.classList.remove('pk'));el.classList.add('pk');document.getElementById('selb').textContent=bed+'（'+type+'）';}
+
+// ── 床位性別／混合限制：讀取病室卡片檢視的實際入住狀態，判斷該病室目前住客性別 ──
+function getRoomBlk(roomNo){
+  return [...document.querySelectorAll('#vgrid .room-blk')].find(rb=>rb.querySelector('.room-no').childNodes[0].textContent.trim()===roomNo);
+}
+function getRoomGenders(roomNo){
+  const genders=new Set();
+  const blk=getRoomBlk(roomNo);
+  if(!blk) return genders;
+  blk.querySelectorAll('.bc').forEach(bc=>{
+    if(bc.classList.contains('avail')||bc.classList.contains('clean')) return;
+    if(bc.querySelector('.av-ml')) genders.add('m');
+    if(bc.querySelector('.av-fe')) genders.add('f');
+  });
+  return genders;
+}
+// 病室卡片檢視：多人房的空床卡片上標示「同房已有男性/女性」，該病室目前沒有住客或住客性別混合時不顯示
+function applyRoomGenderTags(){
+  document.querySelectorAll('#vgrid .room-blk').forEach(blk=>{
+    const bedsG=blk.querySelector('.beds-g');
+    if(!bedsG||bedsG.classList.contains('c1')) return;
+    const roomNo=blk.querySelector('.room-no').childNodes[0].textContent.trim();
+    const genders=getRoomGenders(roomNo);
+    if(genders.size!==1) return;
+    const g=[...genders][0];
+    const label=g==='m'?'同房已有男性':'同房已有女性';
+    blk.querySelectorAll('.bc.avail').forEach(bed=>{
+      const bi=bed.querySelector('.bi');
+      if(bi&&!bi.querySelector('.rg-tag')){
+        const tag=document.createElement('div');
+        tag.className='rg-tag '+g;
+        tag.textContent=label;
+        bi.appendChild(tag);
+      }
+    });
+  });
+}
+// 新增排床彈窗（bp2 pill 列表）：依「選擇個案」下拉選單選定的個案性別，即時鎖定/解鎖同房已有異性住客的空床 pill
+const CASE_GENDER={p1:'m',p2:'f',p3:'m',h1:'m',g1:'f',g2:'m',t1:'m'};
+let selectedCaseGender=null;
+function applyPillGenderLock(){
+  let anyBlocked=false;
+  document.querySelectorAll('#m-case .bp2 .bpc').forEach(el=>{
+    if(el.dataset.origTk==='1') return;
+    const roomNo=el.textContent.trim().split('-')[0];
+    const genders=getRoomGenders(roomNo);
+    const blocked=!!selectedCaseGender&&genders.size>0&&!genders.has(selectedCaseGender);
+    if(blocked){
+      if(el.classList.contains('pk')) document.getElementById('selb').textContent='尚未選擇';
+      el.classList.remove('av','pk');
+      el.classList.add('tk');
+      anyBlocked=true;
+    } else {
+      el.classList.remove('tk');
+      if(!el.classList.contains('pk')) el.classList.add('av');
+    }
+  });
+  const hint=document.getElementById('pill-gender-hint');
+  if(hint) hint.classList.toggle('hidden',!anyBlocked);
+}
 
 // ── 確認排床：測試個案走完整資料搬移示範流程，其餘個案維持原本寫死的提示 ──
 function confirmSchedule(){
@@ -1431,9 +1529,10 @@ function scheduleTestCase(){
     const xtr=document.createElement('tr');
     xtr.id='xtest';
     xtr.className='xrow hidden';
-    xtr.innerHTML="<td colspan='11'><div class='xc'><div class='xf'><label>病歷號</label><span>00099999</span></div><div class='xf'><label>主治醫師</label><span>許醫師（骨科）</span></div><div class='xf'><label>PAC療程</label><span>脆弱性骨折・14天（2週）・預計出院 2026/07/11</span></div><div class='xf'><label>家屬</label><span>陳小華（女兒）</span></div><div class='xf'><label>家屬電話</label><span>0966-777-888 <button class=\"btn btn-xs bg\" onclick=\"alert('已複製')\">複製</button></span></div><div class='xf'><label>房型配對</label><span>無偏好（雙人房）</span></div></div><div class='xact'><button class=\"btn bg btn-xs\" onclick=\"alert('前往個案管理：排床測試')\">前往個案管理 →</button><button class=\"btn bp btn-xs\" onclick=\"admitTestCase()\">確認入院</button></div><div class='xf' style='margin-top:10px'><label>備註</label></div><textarea class='xnote' placeholder='點擊輸入備註…'></textarea></td>";
+    xtr.innerHTML="<td colspan='11'><div class='xc'><div class='xf'><label>病歷號</label><span>00099999</span></div><div class='xf'><label>主治醫師</label><span>許醫師（骨科）</span></div><div class='xf'><label>PAC療程</label><span>脆弱性骨折・14天（2週）・預計出院 2026/07/11</span></div><div class='xf'><label>家屬</label><span>陳小華（女兒）</span></div><div class='xf'><label>家屬電話</label><span>0966-777-888 <button class=\"btn btn-xs bg\" onclick=\"alert('已複製')\">複製</button></span></div><div class='xf'><label>房型配對</label><span>無偏好（雙人房）</span></div><div class='xf'><label>轉介來源</label><span>自收</span></div></div><div class='xact'><button class=\"btn bg btn-xs\" onclick=\"alert('前往個案管理：排床測試')\">前往個案管理 →</button><button class=\"btn bp btn-xs\" onclick=\"admitTestCase()\">確認入院</button></div><div class='xf' style='margin-top:10px'><label>備註</label></div><textarea class='xnote' placeholder='點擊輸入備註…'></textarea></td>";
     const tr=document.createElement('tr');
     tr.id='adm-row-610-B';
+    tr.setAttribute('data-referral','自收');
     tr.setAttribute('onclick',"toggleX('xtest')");
     tr.innerHTML="<td><button class='xb' id='xbtest'>▶</button></td><td><strong>排床測試</strong></td><td>68歲 男</td><td><span class='tt-pac'>PAC</span></td><td>脆弱性骨折</td><td><strong>610-B</strong> <span style='font-size:10px;color:var(--gray-400)'>（雙人）</span></td><td>無偏好</td><td>2026/06/27</td><td>2026/07/11</td><td>林美惠</td><td><button class=\"btn bp btn-xs\" onclick=\"event.stopPropagation();admitTestCase()\">確認入院</button></td>";
     resBody.insertBefore(xtr,resBody.firstChild);
@@ -1462,8 +1561,9 @@ function admitTestCase(){
     const xtr=document.createElement('tr');
     xtr.id='xtest2';
     xtr.className='xrow hidden';
-    xtr.innerHTML="<td colspan='11'><div class='xc'><div class='xf'><label>病歷號</label><span>00099999</span></div><div class='xf'><label>主治醫師</label><span>許醫師（骨科）</span></div><div class='xf'><label>照護週數</label><span>第 1 週 / 2 週</span></div><div class='xf'><label>家屬</label><span>陳小華（女兒）</span></div><div class='xf'><label>家屬電話</label><span>0966-777-888 <button class=\"btn btn-xs bg\" onclick=\"alert('已複製')\">複製</button></span></div><div class='xf'><label>房型</label><span>雙人房（610病室）</span></div></div><div class='xact'><button class=\"btn bg btn-xs\" onclick=\"openModal('m-edit')\">編輯排床</button><button class=\"btn bd btn-xs\" onclick=\"openDischargeConfirm(null,'610-B','排床測試')\">確認出院</button></div><div class='xf' style='margin-top:10px'><label>備註</label></div><textarea class='xnote' placeholder='點擊輸入備註…'></textarea></td>";
+    xtr.innerHTML="<td colspan='11'><div class='xc'><div class='xf'><label>病歷號</label><span>00099999</span></div><div class='xf'><label>主治醫師</label><span>許醫師（骨科）</span></div><div class='xf'><label>照護週數</label><span>第 1 週 / 2 週</span></div><div class='xf'><label>家屬</label><span>陳小華（女兒）</span></div><div class='xf'><label>家屬電話</label><span>0966-777-888 <button class=\"btn btn-xs bg\" onclick=\"alert('已複製')\">複製</button></span></div><div class='xf'><label>房型</label><span>雙人房（610病室）</span></div><div class='xf'><label>轉介來源</label><span>自收</span></div></div><div class='xact'><button class=\"btn bg btn-xs\" onclick=\"openModal('m-edit')\">編輯排床</button><button class=\"btn bd btn-xs\" onclick=\"openDischargeConfirm(null,'610-B','排床測試')\">確認出院</button></div><div class='xf' style='margin-top:10px'><label>備註</label></div><textarea class='xnote' placeholder='點擊輸入備註…'></textarea></td>";
     const tr=document.createElement('tr');
+    tr.setAttribute('data-referral','自收');
     tr.setAttribute('onclick',"toggleX('xtest2')");
     tr.innerHTML="<td><button class='xb' id='xbtest2'>▶</button></td><td><strong>排床測試</strong></td><td>68歲 男</td><td><span class='tt-pac'>PAC</span></td><td>脆弱性骨折</td><td><strong>610-B</strong></td><td>00099999</td><td>2026/06/27</td><td>2026/07/11</td><td>—</td><td><button class=\"btn bd btn-xs\" onclick=\"event.stopPropagation();openDischargeConfirm(null,'610-B','排床測試')\">確認出院</button></td>";
     hospBody.insertBefore(xtr,hospBody.firstChild);
@@ -1486,6 +1586,8 @@ function resetCaseModal(){
   document.getElementById('csel-full').classList.remove('hidden');
   document.querySelectorAll('#m-case .bpc.pk').forEach(c=>c.classList.remove('pk'));
   document.getElementById('selb').textContent='尚未選擇';
+  selectedCaseGender=null;
+  applyPillGenderLock();
 }
 function openBedModal(bedNo,roomType){
   resetCaseModal();
@@ -1649,6 +1751,31 @@ function moveCaseToDischarged(bedNo,caseName){
   }
   if(dBadge) dBadge.textContent=(parseInt(dBadge.textContent,10)||0)+1;
 }
+// ── 滯留原因標記：住院中／展延個案若預計出院已逾期卻遲遲無法出院，供個管師標記「出不去的原因」，純視覺標籤，不觸發分區搬移 ──
+const STUCK_REASONS=['等待轉院','家屬未決定','健保資格問題','等待養護機構床位','其他'];
+function markStuckReason(xid,name){
+  const menu=STUCK_REASONS.map((r,i)=>(i+1)+'. '+r).join('\n');
+  const input=prompt('請選擇「'+name+'」的滯留原因（輸入數字 1-'+STUCK_REASONS.length+'）：\n'+menu);
+  if(input===null) return;
+  const idx=parseInt(input,10)-1;
+  if(isNaN(idx)||idx<0||idx>=STUCK_REASONS.length){ alert('請輸入有效的選項數字'); return; }
+  const reason=STUCK_REASONS[idx];
+  const btn=document.getElementById('stuck-btn-'+xid);
+  if(btn) btn.textContent='已標記：'+reason;
+  const xrow=document.getElementById(xid);
+  const mainRow=xrow?xrow.previousElementSibling:null;
+  if(mainRow){
+    const nameCell=mainRow.children[1];
+    let tag=nameCell?nameCell.querySelector('.stuck-tag'):null;
+    if(!tag&&nameCell){
+      tag=document.createElement('span');
+      tag.className='stuck-tag';
+      nameCell.appendChild(document.createTextNode(' '));
+      nameCell.appendChild(tag);
+    }
+    if(tag) tag.textContent='滯留：'+reason;
+  }
+}
 function switchNcTab(el,id){el.closest('.mb').querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));el.classList.add('active');['nc-m','nc-o','nc-h','nc-i'].forEach(i=>{const e=document.getElementById(i);if(e)e.classList.toggle('hidden',i!==id);});}
 // 供「切換至手動建立」等非 .mtab 觸發點使用：不需要既有 el 參照即可切換 nc-* tab
 function goToNcTab(id){
@@ -1680,6 +1807,7 @@ function showHis(){
 function openModal(id){document.getElementById(id).classList.remove('hidden');}
 function closeModal(id){document.getElementById(id).classList.add('hidden');}
 document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.add('hidden');}));
+applyRoomGenderTags();
 </script>
 </body>
 </html>

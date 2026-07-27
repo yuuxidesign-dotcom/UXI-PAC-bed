@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAC 收案管理</title>
+<link rel="stylesheet" href="個案管理4.css">
+<style>
+/* 表格內可點擊徽章：病摘／PAC判斷／回報上游／家屬確認／階段，點擊開啟對應彈窗 */
+.badge-clickable{cursor:pointer;text-decoration:none;transition:filter .12s ease,box-shadow .12s ease}
+.badge-clickable:hover{filter:brightness(0.92);box-shadow:0 0 0 1px rgba(0,0,0,.08) inset}
+/* 統計卡（本頁不顯示 stat-sub 副標題）：縮小 padding-bottom 避免卡片顯得過空，僅此頁面套用，不影響共用 .stat-card 樣式 */
+.stats-row .stat-card{padding-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">PAC 管理系統</div>
+    <div class="logo-sub">急性後期照護</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item disabled">🏠 個人儀表板</div>
+    <div class="nav-item active">📋 收案管理</div>
+    <div class="nav-item linkable" onclick="location.href='個案管理4.html'">🗂 個案管理</div>
+    <div class="nav-item linkable" onclick="location.href='排床管理2.html'">🛏 排床管理</div>
+    <div class="nav-item disabled">📅 班表總覽頁</div>
+    <div class="nav-item disabled">🏡 居家排班管理</div>
+    <div class="nav-item disabled">📊 評估量表</div>
+    <div class="nav-item disabled">💪 復健紀錄</div>
+    <div class="nav-item disabled">📤 指標匯出</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-row">
+      <div class="user-avatar av-mgr" id="user-av">林</div>
+      <div>
+        <div class="user-name" id="user-name">林美惠</div>
+        <div class="user-role-label" id="user-role-label">個案管理師</div>
+      </div>
+    </div>
+    <div class="role-switcher">
+      <select class="role-select" id="role-select" onchange="switchRole(this.value)">
+        <option value="mgr">個管師</option>
+        <option value="doc">醫師</option>
+        <option value="nur">護理師</option>
+        <option value="adm">行政</option>
+      </select>
+      <span class="role-arrow">▾</span>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="breadcrumb" id="bc">收案管理</div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="font-size:11px;color:var(--gray-400)">2026/06/25 週四</div>
+    </div>
+  </div>
+  <div class="content" id="main-content">
+    <!-- 由 JS 渲染 -->
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     MODALS
+══════════════════════════════ -->
+
+<!-- 新增諮詢：輕量初步建檔，僅收集最基本的 7 項資訊，疾病別／病摘／照護模式等留待個案建立後於展開列逐步補齊 -->
+<div id="modal-new" class="modal-overlay hidden">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div class="modal-title">＋ 新增諮詢</div>
+      <button class="modal-close" onclick="closeModal('modal-new')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="new-manual">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group"><label>姓名 <span class="required">*</span></label><input class="form-control" id="new-manual-name" placeholder="e.g. 陳志明"></div>
+          <div class="form-group"><label>年齡</label><input class="form-control" type="number" min="0" id="new-manual-age" placeholder="e.g. 76"></div>
+          <div class="form-group"><label>目前所在醫院或位置</label><input class="form-control" id="new-manual-location" list="new-manual-location-options" placeholder="e.g. 臺大醫院">
+            <datalist id="new-manual-location-options">
+              <option value="彰化基督">
+              <option value="彰濱秀傳">
+              <option value="常春醫院">
+              <option value="台中三總">
+              <option value="亞東醫院">
+              <option value="中山附醫">
+              <option value="台中榮總">
+              <option value="員榮醫院">
+              <option value="成大附醫">
+              <option value="雲林台大">
+              <option value="門診自轉">
+              <option value="院內自轉">
+              <option value="自行聯繫">
+            </datalist>
+          </div>
+          <div class="form-group"><label>發病時間</label><input class="form-control" type="date" id="new-manual-onsetdate"></div>
+          <div class="form-group"><label>居住地</label><input class="form-control" id="new-manual-address" placeholder="例如：彰化縣員林市○○路○○號"></div>
+          <div class="form-group"><label>家屬聯絡電話</label><input class="form-control" type="tel" id="new-manual-familyphone" placeholder="e.g. 0912-345-678"></div>
+          <div class="form-group"><label>疾病別</label>
+            <select class="form-control" id="new-manual-disease">
+              <option value="">尚未選擇</option>
+              <option value="腦中風">腦中風</option>
+              <option value="創傷性神經損傷">創傷性神經損傷</option>
+              <option value="脆弱性骨折">脆弱性骨折</option>
+              <option value="衰弱高齡">衰弱高齡</option>
+            </select>
+          </div>
+          <div class="form-group"><label>照護模式</label>
+            <select class="form-control" id="new-manual-mode">
+              <option value="">尚未選擇</option>
+              <option value="住院">住院</option>
+              <option value="日照">日照</option>
+              <option value="居家">居家</option>
+            </select>
+          </div>
+          <div class="form-group full" style="grid-column:1/-1">
+            <label>身上是否有管路</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+              <button type="button" class="btn btn-secondary btn-xs" onclick="toggleNewCaseTubeBadge('無')">無</button>
+              <button type="button" class="btn btn-secondary btn-xs" onclick="toggleNewCaseTubeBadge('foley')">foley</button>
+              <button type="button" class="btn btn-secondary btn-xs" onclick="toggleNewCaseTubeBadge('Tr')">Tr</button>
+              <button type="button" class="btn btn-secondary btn-xs" onclick="toggleNewCaseTubeBadge('Cystostomy')">Cystostomy</button>
+              <button type="button" class="btn btn-secondary btn-xs" onclick="toggleNewCaseTubeBadge('十二指腸管')">十二指腸管</button>
+            </div>
+            <input class="form-control" id="new-manual-tubes" placeholder="可點擊上方快選新增，或直接輸入其他管路狀況">
+          </div>
+        </div>
+      </div>
+      <div class="info-note blue" style="margin-top:14px">此為初步諮詢建檔，疾病別／病摘／照護模式等資料，將於個案建立後於列表展開列中逐步補齊。</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-new')">取消</button>
+      <button class="btn btn-primary" onclick="saveNewCase()">儲存諮詢</button>
+    </div>
+  </div>
+</div>
+
+<!-- 轉交醫師/專護判斷 -->
+<div id="modal-judge" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🩺 轉交判斷</div>
+      <button class="modal-close" onclick="closeModal('modal-judge')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-note blue">選擇要委託判斷的人員，系統將發送通知。</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label>委託對象</label><select class="form-control"><option>張宗達醫師（復健科）</option><option>陳玉玲護理師</option></select></div>
+        <div class="form-group"><label>判斷事項說明</label><textarea class="form-control" rows="3" placeholder="說明需要判斷的重點，例如：開刀位置是否符合收案條件..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-judge')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-judge');alert('已送出委託，對方將收到通知')">送出委託</button>
+    </div>
+  </div>
+</div>
+
+<!-- 上游聯繫紀錄：新增 -->
+<div id="modal-upstream-contact" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">🏥 新增上游聯繫紀錄</div>
+      <button class="modal-close" onclick="closeModal('modal-upstream-contact')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:12px">
+        <label>聯繫日期與時間</label>
+        <input class="form-control" type="datetime-local" id="uc-datetime" value="2026-07-09T09:30">
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>聯繫方式</label>
+        <div style="display:flex;gap:16px;margin-top:6px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="radio" name="uc-method" value="電話" checked style="accent-color:var(--blue)"> 電話</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="radio" name="uc-method" value="Line" style="accent-color:var(--blue)"> Line</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer"><input type="radio" name="uc-method" value="當面" style="accent-color:var(--blue)"> 當面</label>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px">
+        <label>回報狀態（可複選）</label>
+        <div class="checklist" style="margin-top:6px">
+          <div class="check-item"><input type="checkbox" id="uc-status-hosp" value="已回報收治・住院" onchange="toggleUpstreamOpenDate()"><span>已回報收治・住院</span></div>
+          <div class="check-item"><input type="checkbox" id="uc-status-day" value="已回報收治・日照" onchange="toggleUpstreamOpenDate()"><span>已回報收治・日照</span></div>
+          <div class="check-item"><input type="checkbox" id="uc-status-home" value="已回報收治・居家" onchange="toggleUpstreamOpenDate()"><span>已回報收治・居家</span></div>
+          <div class="check-item"><input type="checkbox" id="uc-status-decline" value="已回報退案" onchange="toggleUpstreamOpenDate()"><span>已回報退案</span></div>
+        </div>
+      </div>
+      <div class="form-group hidden" id="uc-opendate-wrap" style="margin-bottom:12px">
+        <label>預計開案日</label>
+        <input class="form-control" type="date" id="uc-opendate" value="2026-07-09">
+      </div>
+      <div class="form-group">
+        <label>備註</label>
+        <textarea class="form-control" rows="2" id="uc-note" placeholder="例如：已回報上游收治住院，預計7/15開案"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-upstream-contact')">取消</button>
+      <button class="btn btn-primary" onclick="submitUpstreamContact()">儲存紀錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- 住院個案異動開案／結案日期，且已排床：詢問是否一併清除床位預約（見 收案管理.js saveBasicEdit／confirmConvertToFormal 呼叫 openBedDateChangeModal） -->
+<div id="modal-bed-date-change" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">床位預約異動確認</div>
+      <button class="modal-close" onclick="closeModal('modal-bed-date-change')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-note amber">此個案已在排床模組預約床位，異動開案日期後，該床位預約要一併清除嗎？</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="resolveBedDateChange(false)">否，保留床位</button>
+      <button class="btn btn-danger" onclick="resolveBedDateChange(true)">是，清除床位預約</button>
+    </div>
+  </div>
+</div>
+
+<!-- 家屬聯繫紀錄：新增 -->
+<div id="modal-add-contact" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">📞 新增聯繫紀錄</div>
+      <button class="modal-close" onclick="closeModal('modal-add-contact')">✕</button>
+    </div>
+    <div class="modal-body" id="add-contact-body">
+      <!-- 由 JS 動態渲染（見 openAddContactModal，依既有聯繫紀錄筆數決定「本次聯繫結果」可選項）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-contact')">取消</button>
+      <button class="btn btn-primary" onclick="confirmAddContact()">儲存紀錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- 轉正式病歷確認 checklist -->
+<div id="modal-convert" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📋 轉換為正式病歷</div>
+      <button class="modal-close" onclick="closeModal('modal-convert')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-note amber">＊此 prototype 為測試方便，點擊確認後將直接完成建檔；正式上線後，此步驟仍需由行政人員輸入病歷號才算完成建檔。</div>
+      <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:8px">以下項目僅供提醒，未勾選亦可送出：</div>
+      <div class="checklist">
+        <div class="check-item"><input type="checkbox"><span>已選好日期</span></div>
+        <div class="check-item"><input type="checkbox"><span>已判斷完 PAC</span></div>
+        <div class="check-item"><input type="checkbox"><span>已預約排床（住院適用）</span></div>
+        <div class="check-item"><input type="checkbox"><span>居家可承接（居家適用）</span></div>
+      </div>
+      <div class="form-group" style="margin-top:12px;margin-bottom:12px">
+        <label>預計開案日 <span class="required">*</span></label>
+        <input class="form-control" type="date" id="convert-opendate">
+      </div>
+      <div class="form-group">
+        <label>預計結案日 <span class="required">*</span></label>
+        <input class="form-control" type="date" id="convert-closedate">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-convert')">取消</button>
+      <button class="btn btn-primary" onclick="confirmConvertToFormal()">確認轉換</button>
+    </div>
+  </div>
+</div>
+
+<!-- 行政角色「確認建檔完成」：輸入病歷號後才真正把個案移交個案管理模組（見 收案管理.js confirmAdminFinalize／submitAdminFinalize）-->
+<div id="modal-admin-finalize" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">✅ 確認建檔完成</div>
+      <button class="modal-close" onclick="closeModal('modal-admin-finalize')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-note blue">請輸入行政建檔完成後取得的病歷號，確認後此個案將從收案管理列表移除，移交個案管理模組。</div>
+      <div class="form-group" style="margin-top:12px">
+        <label>病歷號 <span class="required">*</span></label>
+        <input class="form-control" id="admin-finalize-mrn" placeholder="e.g. 00073450">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-admin-finalize')">取消</button>
+      <button class="btn btn-primary" onclick="submitAdminFinalize()">確認</button>
+    </div>
+  </div>
+</div>
+
+<!-- 轉換照護模式：本模組僅臨時病歷階段，單步驟送出即重置為新模式的起始進度（見 收案管理.js 轉換照護模式區塊）-->
+<div id="modal-convert-mode" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="convert-mode-title">轉換照護模式</div>
+      <button class="modal-close" onclick="closeModal('modal-convert-mode')">✕</button>
+    </div>
+    <div class="modal-body" id="convert-mode-body">
+      <!-- 由 JS 動態渲染（見 openConvertModeModal / renderConvertModeModal）-->
+    </div>
+    <div class="modal-footer" id="convert-mode-footer">
+      <!-- 由 JS 動態渲染 -->
+    </div>
+  </div>
+</div>
+
+<!-- PAC 收案判斷確定收案：住院／日照／居家(醫師已回報PAC) 共用 -->
+<div id="modal-collection-confirm" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">確定收案</div>
+      <button class="modal-close" onclick="closeModal('modal-collection-confirm')">✕</button>
+    </div>
+    <div class="modal-body" id="collection-confirm-body">
+      <!-- 由 JS 動態渲染（見 openCollectionConfirmModal）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-collection-confirm')">取消</button>
+      <button class="btn btn-primary" onclick="confirmCollection()">確定收案</button>
+    </div>
+  </div>
+</div>
+
+<!-- 居家收案流程 步驟①：交付復健主管居家報名，確認預計開案／結案日期 -->
+<div id="modal-home-step1" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">交付復健主管居家報名</div>
+      <button class="modal-close" onclick="closeModal('modal-home-step1')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-note blue">確認後將傳送個案資料給復健主管，並記錄預計開案／結案日期。</div>
+      <div class="form-group" style="margin-top:12px;margin-bottom:12px">
+        <label>預計開案日期</label>
+        <input class="form-control" type="date" id="home-step1-opendate" oninput="updateHomeStep1CloseDate()">
+      </div>
+      <div class="form-group">
+        <label>預計結案日期</label>
+        <input class="form-control" type="date" id="home-step1-closedate" readonly>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-home-step1')">取消</button>
+      <button class="btn btn-primary" onclick="confirmHomeStep1Deliver()">確認交付</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAC不收案紀錄（原「封存」；臨時病歷類型清單，或由呼叫端鎖定單一類型） -->
+<div id="modal-archive" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title" id="archive-modal-title">PAC不收案紀錄</div>
+      <button class="modal-close" onclick="closeModal('modal-archive')">✕</button>
+    </div>
+    <div class="modal-body" id="archive-modal-body">
+      <!-- 由 JS 動態渲染（見 openArchiveModal / renderArchiveModalBody） -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-archive')">取消</button>
+      <button class="btn btn-danger" onclick="confirmArchive()">確認列入PAC不收案紀錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- 病摘與PAC判斷（由表格「病摘」／「PAC判斷」徽章觸發，開啟後自動捲動至對應區塊） -->
+<div id="modal-summary-judge" class="modal-overlay hidden">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn btn-ghost btn-xs hidden" id="summary-judge-back-btn" onclick="summaryJudgeGoBack()">← 返回</button>
+        <div class="modal-title">📄 病摘與PAC判斷</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('modal-summary-judge')">✕</button>
+    </div>
+    <div class="modal-body" id="summary-judge-modal-body">
+      <!-- 由 JS 動態渲染（見 openSummaryJudgeModal / renderSummaryJudgeModalBody）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-summary-judge')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 家屬聯絡（由表格「家屬確認」徽章觸發） -->
+<div id="modal-family-contact" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📞 家屬聯絡</div>
+      <button class="modal-close" onclick="closeModal('modal-family-contact')">✕</button>
+    </div>
+    <div class="modal-body" id="family-contact-modal-body">
+      <!-- 由 JS 動態渲染（見 openFamilyContactModal / renderFamilyContactModalBody）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-family-contact')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 上游聯絡（由表格「回報上游」徽章觸發） -->
+<div id="modal-upstream-info" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏥 上游聯絡</div>
+      <button class="modal-close" onclick="closeModal('modal-upstream-info')">✕</button>
+    </div>
+    <div class="modal-body" id="upstream-info-modal-body">
+      <!-- 由 JS 動態渲染（見 openUpstreamInfoModal / renderUpstreamInfoModalBody）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-upstream-info')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 住院排床（由表格「階段」徽章觸發，僅住院模式） -->
+<div id="modal-hosp-bed" class="modal-overlay hidden">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <div class="modal-title">🛏 住院排床</div>
+      <button class="modal-close" onclick="closeModal('modal-hosp-bed')">✕</button>
+    </div>
+    <div class="modal-body" id="hosp-bed-modal-body">
+      <!-- 由 JS 動態渲染（見 openHospBedModal / renderHospBedModalBody）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-hosp-bed')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 居家收案流程（由表格「階段」徽章觸發，僅居家模式） -->
+<div id="modal-home-flow" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏡 居家收案流程</div>
+      <button class="modal-close" onclick="closeModal('modal-home-flow')">✕</button>
+    </div>
+    <div class="modal-body" id="home-flow-modal-body">
+      <!-- 由 JS 動態渲染（見 openHomeFlowModal / renderModeFlowBlock）-->
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-home-flow')">關閉</button>
+    </div>
+  </div>
+</div>
+
+<script src="收案管理.js"></script>
+</body>
+</html>
